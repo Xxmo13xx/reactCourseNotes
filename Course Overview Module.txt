@@ -1,0 +1,7 @@
+-REACT: Is a javascript library not a framework. 
+-It is not a complete solution. It doesn't assume anything about the other parts of the stack. It simply focuses on building the UI and that's it. 
+-React is declarative, we tell react what we want and it takes what we want and builds it. We simply tell react what we want and it figures the rest out. 
+-React is the View in the MVC paradigm. 
+-React has components: that are like functions that we call with input and it produces the output. They are reusable and composable. They can manage a private state as well that holds data that may change over time. React has reactive updates, as the input changes so will the component.
+-React will automatically update the DOM when components change. 
+-You can write HTML in JavaScript, rather than enhancing HTML. When you use React to build the html page it allows react to have a virtual representation of the webpage in memory. This is called the Virtual DOM. That way when state changes React will update the virtual DOM and then only change the web browser DOM with datat that has changed. Anything that didn't change will stay the same. This is called Tree reconciliation. 

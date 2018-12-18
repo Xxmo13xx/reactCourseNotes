@@ -1,0 +1,145 @@
+React Components have two types:
+    1. Function Component:
+        The simplest form of a component. It recieve properties aka props
+        It returns JSX (java representation of HTML)
+    2. Class Component:
+        It takes props like a funciton component but it also has a private state that when it changes it will update the component. This gives it the reactive nature. 
+            The state can be changed while the props are static. 
+JSX: allows us to describe the DOM using HTML like syntax.
+Most of the basic components will initially be created using the https://jscomplete.com/repl to create standalone components without having to create a webpage. I will copy them and paste them in once the module is complete.  
+
+
+Code Snippet 1:
+    // create a constant Button variable that is equal to a React Function. By using the => (arrow function) you essentially create a generic function. the (props) is the variables that the generic function takes. For React that is props.
+    const Button =  (props) => {
+        //The function will return the JSX code that we need to render. 
+        return (
+        //By placing {} in the button we can reference the props variable and whatever attributes for the props that we created in the render code below. In this case we called <Button with label so we called it here. 
+        <button> {props.label} </button>
+        );
+    }
+    // When you are ready to update the DOM you call ReactDOM.render() and then you pass in the function or class that you want to render, followed by where you would like to render the code. In this case we pass a button with a props attribute called label and we render the code in the mountNode. 
+    //Note mountNode is a html tag used in the jscomplete.com/repl so we don't have to build anything. In real life we would create it using getElementByID('name_of_element)
+    ReactDOM.render(<Button label="Do" />, mountNode);
+    //When ran this code will create a button with the word "Do" inside of it. 
+
+
+Code Snippet 2:
+
+/* In order to make the component reactive we need to create a class for it. The class needs to extend React.Component. 
+*/
+class Button extends React.Component{
+	/* In order to pass props and give the class an inital state you need to create a consturctor that takes props as an argument. Then call the super() and give it props as an argument. Finally you can assign the initial state to the class. When assigning the name and value of the state use {name_of_state_variable : value_of_state_variable}
+  */
+  /* This code is the traditional way of assigning the state for the component. The newer method which I will use is currently not understood by javascript but it is expected to be implemented in the future. 
+	constructor(props){
+  	super(props);
+    this.state={counter:0};
+  }
+  However the code below is understood by Babel (a JavaScript compiler). Which understands the statement below and will transpose it into syntax traditional javascript will understand. 
+  */
+  
+  state = {counter:0}
+  
+  
+  /* The only method the component needs to have is the render() funciton. The render function is simply what will be the JSX that is returned.
+  */
+	handleClick = () => {
+  	/*react components have a builtin setState object for class components. You can simply use setState, however theoretically you can have a bunch of states batched to update which would cause issues. So instead you pass a function of setState that takes (prevState) as an argument to the this ensures the correct value for the previous state is used. 
+    You only have to do this when the state change depends on the previous value of the state change. 
+    */
+    this.setState((prevState) =>{
+    // now when the button is clicked it will increment the button by 1
+    	return {
+    	counter : this.prevState.counter + 1
+			};  
+    });
+  };
+  
+  render(){
+  	return(
+    	<button onClick={this.handleClick}>
+      	{this.state.counter}
+      </button>
+    )
+  }
+}
+
+
+Code Snippet 3:
+/*
+	We will change the functionality of the code so that way the button will now only increment the counter and the value inside the button won't chage. We will create a new component that's sole purpose is to display the counter. 
+*/
+/*
+	However this causes an issue. Because the Result Component has no way of accessing the private state of the counter located inside the Button class. We will need to move the state to the parent app and then pass the counter as a prop to the Button Class.
+*/
+class Button extends React.Component{
+  
+  
+	handleClick = () =>{
+  	this.props.onClickFunction(this.props.incrementValue)
+  };
+  
+  render(){
+  	return(
+    // this actually invokes the app (parent) components onClickFunction (incrementCounter)
+    // make sure you access the props with this.props
+    	<button onClick={this.handleClick}>
+      	+{this.props.incrementValue}
+      </button>
+    )
+  }
+}
+
+const Result = (props) =>{
+	return (
+  	<div>{props.counter}</div>
+  );
+};
+
+/*
+	Used  to include all the other components. We use class because we will need to introduce a state object. 
+*/
+class App extends React.Component {
+	state = { counter: 0};
+  //This is funcitonal setState. Look into functional setstate again. 
+  incrementCounter = (incrementValue) =>{
+  	this.setState((prevState) => ({
+    	counter : prevState.counter + incrementValue
+    }));
+  };
+  
+	render(){
+  	return (
+    	/*
+      	Wrapping the Button and Result components in a div tag is not optional. A react component can only return one element. So by placing the two components into one we can include both of them in the render. So when you need to return sibling elements, you must add them to a parent element and return the parent
+      */
+    	<div>
+      	<Button  incrementValue = {1} onClickFunction={this.incrementCounter}/>
+        <Button  incrementValue = {5} onClickFunction={this.incrementCounter}/>
+        <Button  incrementValue = {10} onClickFunction={this.incrementCounter}/>
+        <Button  incrementValue = {100} onClickFunction={this.incrementCounter}/>
+        <Result counter={this.state.counter}/>
+      </div>
+    );
+  }
+}
+
+ReactDOM.render(<App />, mountNode);
+
+/* The place where you store the state is always an important question when designing React components. 
+*/
+
+Summary:
+1. Components are the building blocks of React Applications. 
+  -Components take a props (short hand for properties) values from the parent that can then be referenced inside the Component.
+  -When you create a class version of a Component you can also add a state to the Component which you can change using the setState object or function. I definitely need to review functional setState again because it can do some powerful stuff go to this website https://medium.freecodecamp.org/functional-setstate-is-the-future-of-react-374f30401b6b
+    Examples of what you can do: 
+    |_You can declare state changes separately from the component classes and then call it inside your Component class
+    |_Declaring state updates as pure functions makes it a breeze to test complex state transitions. Even no need for shallow rendering!
+    |_You can also pass extra arguments to calculate the next state (this one blew my mind… #funfunFunction).
+  -The props of a component can't be changed
+  -We use JSX to create HTML and then render the DOM using the JSX code that is transformed into traditional HTML code.
+  -Funciton components can be used when they are used to simply display information. If it needs to chagne then it should be a class Component. 
+  -Render changes to the DOM using the ReactDOM.render(component_to_render, tag_to_hold_the_elements_created) function.  
+  -React has events that we can use to receive user interactions. 
